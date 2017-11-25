@@ -21,14 +21,15 @@ shinyUI(
         textInput("in_string", "In the box below, input the word or phrase",value = ""),
         hr(),
         helpText("The most common word will be shown on the right as the predicted word."), 
-        hr()
+        hr(),
+        submitButton("Submit")
       ),
       mainPanel(
         strong("Entered word or Phrase is:"),
-        strong(code(textOutput('sentence1'))),
+        strong(code(textOutput('out1'))),
         br(),
         strong("Predicted word is:"),
-        strong(code(textOutput('sentence2'))),
+        strong(code(textOutput('out2'))),
         hr()
         
       )

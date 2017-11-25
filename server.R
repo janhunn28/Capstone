@@ -14,8 +14,6 @@ library(shiny);
 readRDS(biC, file = "C:/Users/janhu/Documents/Data Science/Capstone/biC.rds")
 readRDS(triC, file = "C:/Users/janhu/Documents/Data Science/Capstone/triC.rds")
 readRDS(quadC, file = "C:/Users/janhu/Documents/Data Science/Capstone/quadC.rds")
-readRDS(quintC, file = "C:/Users/janhu/Documents/Data Science/Capstone/quintC.rds")
-
 
 ##n-Gram Functions needed based on the input
 
@@ -23,7 +21,6 @@ readRDS(quintC, file = "C:/Users/janhu/Documents/Data Science/Capstone/quintC.rd
 bigram_predict = function(x){
   ret_word = biC[biC[1]==x,]$word2
   return(ret_word)
-  
 }
 
 #If two words are entered, call the trigram prediction dictionary first.
@@ -49,8 +46,6 @@ quintgram_predict = function(x,y,z,a) {
 
 
 
-
-
 #################################################
 #The algorithm is a fairly "Stupid" Backoff model where it is based on the number of 
 #words entered.  If 4 words or more are entered, it will predict the fifth word from the 
@@ -68,37 +63,37 @@ quintgram_predict = function(x,y,z,a) {
 
 ## ShineServer code to call the function predictWord
 shinyServer(function(input, output) {
+
 pw <- reactive({  
   words <- strsplit(input$in_string," ")[[1]]
   long <- length(words)
  
+
   #clear out predict_word from any previous run
-  predict_word = ' '
+  predict_word = character(0)
+
   
-  if (long >= 4) {
-    predict_word = quintgram_predict(words[long-3], words[long-2], words[long-1], words[long])
-    long = 3
-  }   
-  if (predict_word == ' ' & long == 3) {
-    predict_word = quadgram_predict(words[long-2], words[long-1], words[long])
+  if (long >=3) {
+    predict_word = quadgram_predict(words[length(words)-2], words[length(words)-1], words[length(words)])
     long = 2
-  }
-  
-  if (predict_word == ' ' & long == 2) {
-    predict_word = trigram_predict(words[long-1],words[long])
+  } 
+  if (length(predict_word) == 0 & long == 2) {
+    predict_word = trigram_predict(words[length(words)-1],words[length(words)])
     long = 1
-  }
+    predict_word
+  } 
+  if (length(predict_word) == 0 & long == 1) {
+    predict_word = bigram_predict(words[length(words)]) 
+    predict_word
+  } 
+  if (length(predict_word) == 0) predict_word = 'the'
   
-  if (predict_word == ' ' & long == 1) 
-    predict_word = bigram_predict(words[long])  
-  
-  
- if (predict_word == "") predict_word = 'the'
  predict_word
+ 
 }) 
  
-    output$sentence2 <- renderText(pw());
-    output$sentence1 <- renderText({input$in_string});
+    output$out2 <- renderText(pw());
+    output$out1 <- renderText({input$in_string});
     
     
  }
